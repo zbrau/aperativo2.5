@@ -1,0 +1,5 @@
+{
+  "name": "apera",
+  "description": "Una aplicación estilo delivery para ordenar y apartar comida en la cafetería escolar. Incluye asistente inteligente para recomendaciones nutricionales.",
+  "requestFramePermissions": []
+}
