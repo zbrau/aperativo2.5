@@ -1,14 +1,17 @@
-import React from 'react';
-import { Plus, Clock, Flame, TrendingDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Clock, Flame, TrendingDown, Heart } from 'lucide-react';
 import { MenuItem } from '../types';
 
 interface FoodItemProps {
     item: MenuItem;
     onAdd: (item: MenuItem) => void;
+    isFavorite?: boolean;
+    onToggleFavorite?: (itemId: string) => void;
 }
 
-const FoodItem: React.FC<FoodItemProps> = ({ item, onAdd }) => {
-    
+const FoodItem: React.FC<FoodItemProps> = ({ item, onAdd, isFavorite = false, onToggleFavorite }) => {
+    const [heartPulse, setHeartPulse] = useState(false);
+
     // Simulación: El precio en la cafetería física es 5 UC más caro
     const storePrice = item.price + 5;
 
@@ -16,6 +19,16 @@ const FoodItem: React.FC<FoodItemProps> = ({ item, onAdd }) => {
         e.preventDefault();
         e.stopPropagation();
         onAdd(item);
+    };
+
+    const handleToggleFav = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (onToggleFavorite) {
+            setHeartPulse(true);
+            setTimeout(() => setHeartPulse(false), 300);
+            onToggleFavorite(item.id);
+        }
     };
 
     return (
@@ -42,6 +55,20 @@ const FoodItem: React.FC<FoodItemProps> = ({ item, onAdd }) => {
                         <span>AHORRA 5 UC</span>
                     </div>
                 </div>
+
+                {/* Heart / Favorite Button */}
+                {onToggleFavorite && (
+                    <button
+                        onClick={handleToggleFav}
+                        className={`absolute top-2 right-2 p-1.5 rounded-full z-10 transition-all shadow-sm ${
+                            isFavorite
+                                ? 'bg-red-500 text-white'
+                                : 'bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-red-500 backdrop-blur-sm'
+                        } ${heartPulse ? 'animate-heart' : ''}`}
+                    >
+                        <Heart size={14} className={isFavorite ? 'fill-current' : ''} />
+                    </button>
+                )}
                 
                 <div className="absolute bottom-2 right-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1 shadow-sm z-10">
                     <Clock size={10} />

@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Search, Home, Menu as MenuIcon, ShoppingBag, User as UserIcon, Bell, MapPin, Coins, QrCode, Check, X, LogOut, School, BookOpen, Users, ChevronRight, ArrowLeft, Loader2, Moon, Sun, ClipboardList, ShieldCheck, AlertCircle, DollarSign, Gift, Award, Sparkles, Flame, Clock, ChefHat, PackageCheck, History, Trash2, Banknote, Edit3, Plus, Image as ImageIcon, Save } from 'lucide-react';
+import { Search, Home, Menu as MenuIcon, ShoppingBag, User as UserIcon, Bell, MapPin, Coins, QrCode, Check, X, LogOut, School, BookOpen, Users, ChevronRight, ArrowLeft, Loader2, Moon, Sun, ClipboardList, ShieldCheck, AlertCircle, DollarSign, Gift, Award, Sparkles, Flame, Clock, ChefHat, PackageCheck, History, Trash2, Banknote, Edit3, Plus, Image as ImageIcon, Save, Heart, HelpCircle } from 'lucide-react';
 import FoodItem from './components/FoodItem';
 import Cart from './components/Cart';
 import AIAssistant from './components/AIAssistant';
@@ -8,6 +8,10 @@ import { MENU_ITEMS as DEFAULT_MENU_ITEMS, CATEGORIES } from './constants';
 import AdminScreen from './components/AdminScreen';
 import RechargeModal from './components/RechargeModal';
 import AvatarModal from './components/AvatarModal';
+import { ToastProvider, useToast } from './components/ToastProvider';
+import { FoodItemSkeleton, OrderSkeleton } from './components/Skeleton';
+import HelpModal from './components/HelpModal';
+import RechargeHistory from './components/RechargeHistory';
 import { Category, MenuItem, CartItem, Screen, PickupTime, Order, OrderStatus, User, PendingRecharge } from './types';
 // Firebase Imports
 import { db } from './services/firebase';
@@ -73,6 +77,14 @@ const App: React.FC = () => {
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
     const [isAvatarZoomed, setIsAvatarZoomed] = useState(false);
     // AVATARS moved to AvatarModal.tsx
+
+    // New feature state
+    const [showHelpModal, setShowHelpModal] = useState(false);
+    const [showRechargeHistory, setShowRechargeHistory] = useState(false);
+    const [showAIChat, setShowAIChat] = useState(false);
+
+    // Toast hook
+    const toast = useToast();
 
     // --- Auth Form State ---
     const [loginEmail, setLoginEmail] = useState('');
@@ -289,7 +301,7 @@ const App: React.FC = () => {
                 return;
             }
 
-            const newUser = {
+            const newUser: any = {
                 name: regName,
                 email: regEmail,
                 school: regSchool,
@@ -301,7 +313,7 @@ const App: React.FC = () => {
             };
 
             await db.collection("users").doc(regEmail).set(newUser);
-            alert('¡Registro exitoso! Por favor inicia sesión.');
+            toast.success('¡Registro exitoso! Por favor inicia sesión.');
             setAuthMode('LOGIN');
             setLoginEmail(regEmail);
             setRegName(''); setRegEmail(''); setRegPass(''); setRegSchool(''); setRegGrade(''); setRegGroup('');
@@ -362,7 +374,7 @@ const App: React.FC = () => {
             setEditingItem({});
         } catch (error) {
             console.error("Error saving item:", error);
-            alert("Error guardando el platillo.");
+            toast.error("Error guardando el platillo.");
         } finally {
             setIsAdminProcessing(false);
         }
@@ -383,7 +395,7 @@ const App: React.FC = () => {
         try {
             const orderRef = db.collection("orders").doc(orderId);
             await orderRef.update({ status: newStatus });
-        } catch (error) { console.error(error); alert("Error actualizando"); } finally { setIsAdminProcessing(false); }
+        } catch (error) { console.error(error); toast.error("Error actualizando el estado del pedido."); } finally { setIsAdminProcessing(false); }
     };
 
     const handleAdminLookup = async () => {
@@ -473,7 +485,7 @@ const App: React.FC = () => {
 
         if (paymentMethod === 'COINS') {
             if (total > user.balance) {
-                alert("¡Oh no! Te faltan Ucol Coins para pagar este pedido. Recarga saldo o paga en efectivo.");
+                toast.error("¡Oh no! Te faltan Ucol Coins para pagar este pedido. Recarga saldo o paga en efectivo.");
                 return;
             }
             newBalance = user.balance - total;
@@ -481,7 +493,7 @@ const App: React.FC = () => {
 
         const currentPoints = user.loyaltyPoints || 0;
         if (pointsRedeemed > 0 && currentPoints < pointsRedeemed) {
-            alert("No tienes suficientes puntos para canjear esta recompensa.");
+            toast.error("No tienes suficientes puntos para canjear esta recompensa.");
             return;
         }
 
@@ -519,9 +531,9 @@ const App: React.FC = () => {
             setCartItems([]); setIsCartOpen(false); setActiveScreen('ORDERS');
             let msg = `¡Pedido confirmado! Pasa a recogerlo: ${pickupTime}.`;
             if (paymentMethod === 'CASH') msg += " Recuerda pagar en efectivo.";
-            alert(msg);
+            toast.success(msg);
 
-        } catch (error) { console.error("Error pedido:", error); alert("Error de conexión."); }
+        } catch (error) { console.error("Error pedido:", error); toast.error("Error de conexión."); }
     };
 
     const handleClearHistory = async () => {
@@ -531,7 +543,7 @@ const App: React.FC = () => {
             const q = db.collection("orders").where("userId", "==", user.email).where("status", "==", OrderStatus.COMPLETED);
             const snapshot = await q.get(); const batch = db.batch();
             snapshot.forEach((doc: any) => batch.delete(doc.ref));
-            await batch.commit(); alert("Historial limpiado.");
+            await batch.commit(); toast.success("Historial limpiado.");
         } catch (error) { console.error(error); }
     };
 
@@ -546,8 +558,22 @@ const App: React.FC = () => {
     }, [user]);
     const handleFinishRecharge = useCallback(async () => {
         setShowRechargeModal(false);
-        alert(`¡Solicitud enviada! Espera a que el administrador valide tu pago.`);
-    }, []);
+        toast.success('¡Solicitud enviada! Espera a que el administrador valide tu pago.');
+    }, [toast]);
+
+    // --- Favorites Handler ---
+    const handleToggleFavorite = useCallback(async (itemId: string) => {
+        if (!user || user.email === 'admin@ucol.mx') return;
+        const currentFavs = user.favorites || [];
+        const isFav = currentFavs.includes(itemId);
+        const newFavs = isFav ? currentFavs.filter(id => id !== itemId) : [...currentFavs, itemId];
+        try {
+            await db.collection('users').doc(user.email).update({ favorites: newFavs });
+            if (!isFav) toast.success('❤️ Agregado a favoritos');
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+    }, [user, toast]);
 
     // --- Render Loading ---
     if (isLoadingUser) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"><Loader2 className="w-10 h-10 text-green-600 animate-spin" /></div>;
@@ -715,14 +741,20 @@ const App: React.FC = () => {
 
             {/* Results Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {filteredItems.map(item => (
-                    <FoodItem key={item.id} item={item} onAdd={addToCart} />
-                ))}
-                {filteredItems.length === 0 && (
-                    <div className="col-span-full py-20 text-center text-gray-400">
-                        <p>No se encontraron resultados.</p>
-                        <button onClick={() => { setSelectedCategory(Category.ALL); setSearchQuery('') }} className="text-green-500 font-bold mt-2">Limpiar filtros</button>
-                    </div>
+                {menuItems.length === 0 ? (
+                    <>{[1,2,3,4,5,6].map(i => <FoodItemSkeleton key={i} />)}</>
+                ) : (
+                    <>
+                        {filteredItems.map(item => (
+                            <FoodItem key={item.id} item={item} onAdd={addToCart} isFavorite={(user?.favorites || []).includes(item.id)} onToggleFavorite={handleToggleFavorite} />
+                        ))}
+                        {filteredItems.length === 0 && (
+                            <div className="col-span-full py-20 text-center text-gray-400">
+                                <p>No se encontraron resultados.</p>
+                                <button onClick={() => { setSelectedCategory(Category.ALL); setSearchQuery('') }} className="text-green-500 font-bold mt-2">Limpiar filtros</button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
@@ -740,8 +772,15 @@ const App: React.FC = () => {
             <div className="space-y-6 animate-fade-in">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Mis Pedidos</h2>
 
+                {/* Loading Skeletons */}
+                {isLoadingOrders && (
+                    <div className="space-y-4">
+                        {[1,2,3].map(i => <OrderSkeleton key={i} />)}
+                    </div>
+                )}
+
                 {/* Active Orders */}
-                {active.length > 0 && (
+                {!isLoadingOrders && active.length > 0 && (
                     <div className="space-y-4">
                         <h3 className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-wider">En proceso</h3>
                         {active.map(order => (
@@ -887,13 +926,13 @@ const App: React.FC = () => {
 
                     {/* Secondary Actions Row */}
                     <div className="grid grid-cols-2 gap-4">
-                        <button className="bg-white dark:bg-[#1e2330] hover:bg-gray-50 dark:hover:bg-[#252b3b] p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between group transition-all shadow-sm">
+                        <button onClick={() => setShowHelpModal(true)} className="bg-white dark:bg-[#1e2330] hover:bg-gray-50 dark:hover:bg-[#252b3b] p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between group transition-all shadow-sm">
                             <div>
                                 <h4 className="font-bold text-gray-800 dark:text-white text-sm">Ayuda y Soporte</h4>
                             </div>
                             <ChevronRight className="text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-white transition-colors" size={16} />
                         </button>
-                        <button className="bg-white dark:bg-[#1e2330] hover:bg-gray-50 dark:hover:bg-[#252b3b] p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between group transition-all shadow-sm">
+                        <button onClick={() => setShowRechargeHistory(true)} className="bg-white dark:bg-[#1e2330] hover:bg-gray-50 dark:hover:bg-[#252b3b] p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between group transition-all shadow-sm">
                             <div>
                                 <h4 className="font-bold text-gray-800 dark:text-white text-sm">Historial Recargas</h4>
                             </div>
@@ -962,6 +1001,20 @@ const App: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Favorites Section */}
+                        {(user?.favorites || []).length > 0 && (
+                            <div className="animate-slide-up stagger-1b">
+                                <div className="flex justify-between items-center mb-3">
+                                    <h3 className="font-bold text-gray-800 dark:text-white text-lg flex items-center gap-2"><Heart size={18} className="text-red-500 fill-current" /> Tus Favoritos</h3>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    {menuItems.filter(i => (user?.favorites || []).includes(i.id)).slice(0, 4).map(item => (
+                                        <FoodItem key={item.id} item={item} onAdd={addToCart} isFavorite={true} onToggleFavorite={handleToggleFavorite} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Popular Items - Dynamic */}
                         <div className="animate-slide-up stagger-2">
                             <div className="flex justify-between items-center mb-3">
@@ -969,9 +1022,13 @@ const App: React.FC = () => {
                                 <button onClick={() => setActiveScreen('MENU')} className="text-green-600 dark:text-green-400 text-sm font-medium hover:underline">Ver todo</button>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {menuItems.filter(i => i.isPopular).slice(0, 4).map(item => (
-                                    <FoodItem key={item.id} item={item} onAdd={addToCart} />
-                                ))}
+                                {menuItems.length === 0 ? (
+                                    <>{[1,2,3,4].map(i => <FoodItemSkeleton key={i} />)}</>
+                                ) : (
+                                    menuItems.filter(i => i.isPopular).slice(0, 4).map(item => (
+                                        <FoodItem key={item.id} item={item} onAdd={addToCart} isFavorite={(user?.favorites || []).includes(item.id)} onToggleFavorite={handleToggleFavorite} />
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1019,7 +1076,7 @@ const App: React.FC = () => {
                                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Logo_de_la_Universidad_de_Colima.svg/640px-Logo_de_la_Universidad_de_Colima.svg.png" alt="UCol Logo" className="w-full h-full object-contain" />
                             </div>
                             <div className="hidden sm:flex flex-col">
-                                <h1 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white leading-tight tracking-tight">Snack Udc</h1>
+                                <h1 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white leading-tight tracking-tight">Snack UDC</h1>
                                 <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 gap-1"><MapPin className="w-3 h-3" /><span>{user.school}</span></div>
                             </div>
                         </div>
@@ -1098,6 +1155,8 @@ const App: React.FC = () => {
             />
 
             <AIAssistant menuItems={menuItems} />
+            <HelpModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
+            <RechargeHistory isOpen={showRechargeHistory} onClose={() => setShowRechargeHistory(false)} userEmail={user?.email || ''} />
             <RechargeModal
                 showRechargeModal={showRechargeModal}
                 setShowRechargeModal={setShowRechargeModal}
@@ -1130,4 +1189,12 @@ const App: React.FC = () => {
         </div>
     );
 };
-export default App;
+
+// Wrap App with ToastProvider
+const AppWithProviders: React.FC = () => (
+    <ToastProvider>
+        <App />
+    </ToastProvider>
+);
+
+export default AppWithProviders;

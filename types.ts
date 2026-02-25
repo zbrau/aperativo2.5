@@ -71,6 +71,7 @@ export interface User {
     balance: number;
     loyaltyPoints?: number; // Points accumulated for free meal
     avatar?: string; // Avatar URL or emoji
+    favorites?: string[]; // Favorited menu item IDs
 }
 
 export interface PendingRecharge {
