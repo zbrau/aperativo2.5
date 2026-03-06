@@ -604,11 +604,11 @@ const App: React.FC = () => {
                             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
 
-                        <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg p-2 overflow-hidden animate-float">
+                        <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg overflow-hidden animate-float border-4 border-white/30">
                             <img
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Logo_de_la_Universidad_de_Colima.svg/640px-Logo_de_la_Universidad_de_Colima.svg.png"
-                                alt="UCol Logo"
-                                className="w-full h-full object-contain"
+                                src="https://i.ibb.co/LdtGgYNY/Dise-o-sin-t-tulo.png"
+                                alt="Snack UDC Logo"
+                                className="w-full h-full object-cover"
                             />
                         </div>
                         <h1 className="text-2xl font-bold mb-1">Snack UDC</h1>
@@ -1086,8 +1086,8 @@ const App: React.FC = () => {
                 <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 transition-colors supports-[backdrop-filter]:bg-white/60 animate-fade-in">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 md:h-20 flex justify-between items-center">
                         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveScreen('HOME')}>
-                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white flex items-center justify-center p-1 shadow-sm border border-gray-100 group-hover:scale-105 transition-transform">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Logo_de_la_Universidad_de_Colima.svg/640px-Logo_de_la_Universidad_de_Colima.svg.png" alt="UCol Logo" className="w-full h-full object-contain" />
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 group-hover:scale-105 transition-transform">
+                                <img src="https://i.ibb.co/LdtGgYNY/Dise-o-sin-t-tulo.png" alt="Snack UDC Logo" className="w-full h-full object-cover" />
                             </div>
                             <div className="hidden sm:flex flex-col">
                                 <h1 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white leading-tight tracking-tight">Snack UDC</h1>
