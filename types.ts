@@ -52,6 +52,7 @@ export interface Order {
     userId?: string;
     pickupCode?: string; // New field for the "Direct Pickup" code
     paymentMethod?: 'CASH' | 'COINS'; // New field for payment type
+    school?: string; // Bachillerato associated with the order
 }
 
 export type Screen = 'HOME' | 'MENU' | 'CART' | 'PROFILE' | 'ORDERS' | 'ADMIN_PANEL';
@@ -83,4 +84,5 @@ export interface PendingRecharge {
     status: 'PENDING' | 'COMPLETED';
     createdAt: string;
     processedAt?: number;
+    school?: string; // Bachillerato associated with the request
 }

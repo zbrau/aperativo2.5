@@ -1,4 +1,4 @@
-# Snack Udc - Cafetería UCol
+# Snack Udc - Cafetería UCol 🏴‍☠️
 
 Aplicación web para la gestión de pedidos y menú de cafetería escolar.
 

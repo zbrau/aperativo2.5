@@ -25,6 +25,8 @@ interface AdminScreenProps {
     handleSaveItem: () => void;
     handleDeleteItem: (id: string) => void;
     handleLogout: () => void;
+    adminSelectedSchool: string;
+    onBackToSchoolSelect: () => void;
 }
 
 const AdminScreen: React.FC<AdminScreenProps> = ({
@@ -48,7 +50,9 @@ const AdminScreen: React.FC<AdminScreenProps> = ({
     openEditItemModal,
     handleSaveItem,
     handleDeleteItem,
-    handleLogout
+    handleLogout,
+    adminSelectedSchool,
+    onBackToSchoolSelect
 }) => {
     const activeOrders = orders.filter(o => o.status !== OrderStatus.COMPLETED);
     const historyOrders = orders.filter(o => o.status === OrderStatus.COMPLETED);
@@ -62,10 +66,20 @@ const AdminScreen: React.FC<AdminScreenProps> = ({
                         <ArrowLeft className="w-6 h-6" />
                     </button>
                     <div>
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            Panel de Cocina
-                        </h2>
-                        <p className="text-sm text-gray-400">Administración de Cafetería</p>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                Panel de Cocina
+                            </h2>
+                            <button 
+                                onClick={onBackToSchoolSelect} 
+                                className="bg-gray-800 hover:bg-gray-700 text-xs font-bold text-green-400 px-3 py-1 rounded-full transition-colors border border-gray-700"
+                            >
+                                Cambiar Plantel
+                            </button>
+                        </div>
+                        <p className="text-sm text-gray-400 flex items-center gap-1 mt-1">
+                            Administrando: <span className="font-bold text-white">{adminSelectedSchool}</span>
+                        </p>
                     </div>
                 </div>
 

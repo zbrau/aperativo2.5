@@ -4,7 +4,7 @@ import { Search, Home, Menu as MenuIcon, ShoppingBag, User as UserIcon, Bell, Ma
 import FoodItem from './components/FoodItem';
 import Cart from './components/Cart';
 import AIAssistant from './components/AIAssistant';
-import { MENU_ITEMS as DEFAULT_MENU_ITEMS, CATEGORIES } from './constants';
+import { MENU_ITEMS as DEFAULT_MENU_ITEMS, CATEGORIES, BACHILLERATOS } from './constants';
 import AdminScreen from './components/AdminScreen';
 import RechargeModal from './components/RechargeModal';
 import AvatarModal from './components/AvatarModal';
@@ -72,6 +72,7 @@ const App: React.FC = () => {
     // Admin Menu Management State
     const [isEditingItem, setIsEditingItem] = useState(false);
     const [editingItem, setEditingItem] = useState<Partial<MenuItem>>({});
+    const [adminSelectedSchool, setAdminSelectedSchool] = useState<string>('');
 
     // Avatar State
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
@@ -335,6 +336,7 @@ const App: React.FC = () => {
         setLoginPass('');
         setRegPass('');
         setLoginEmail('');
+        setAdminSelectedSchool('');
     };
 
     // --- Admin Menu Logic ---
@@ -510,7 +512,8 @@ const App: React.FC = () => {
             pickupTime,
             userId: user.email,
             pickupCode,
-            paymentMethod
+            paymentMethod,
+            school: user.school
         };
 
         try {
@@ -553,7 +556,7 @@ const App: React.FC = () => {
         const code = `UCOL-${amount}-${Math.floor(1000 + Math.random() * 9000)}`;
         setRechargeCode(code); setRechargeStep('SHOW_CODE');
         if (user && user.email !== 'admin@ucol.mx') {
-            try { await db.collection("recharge_requests").add({ code, amount, userId: user.email, userName: user.name, status: 'PENDING', createdAt: new Date().toISOString() }); } catch (error) { }
+            try { await db.collection("recharge_requests").add({ code, amount, userId: user.email, userName: user.name, status: 'PENDING', createdAt: new Date().toISOString(), school: user.school }); } catch (error) { }
         }
     }, [user]);
     const handleFinishRecharge = useCallback(async () => {
@@ -682,8 +685,22 @@ const App: React.FC = () => {
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Bachillerato</label>
                                     <div className="relative">
-                                        <School className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                        <input type="text" placeholder="Bach 1" className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl pl-9 pr-3 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 dark:focus:border-green-400 transition-colors" value={regSchool} onChange={e => setRegSchool(e.target.value)} required />
+                                        <School className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 z-10" />
+                                        <select 
+                                            className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl pl-9 pr-3 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-green-500 dark:focus:border-green-400 transition-colors" 
+                                            value={regSchool} 
+                                            onChange={e => setRegSchool(e.target.value)} 
+                                            required
+                                        >
+                                            <option value="" disabled>Selecciona tu plantel</option>
+                                            {Object.entries(BACHILLERATOS).map(([campus, schools]) => (
+                                                <optgroup key={campus} label={campus}>
+                                                    {schools.map(school => (
+                                                        <option key={school} value={school}>{school}</option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
@@ -1125,29 +1142,60 @@ const App: React.FC = () => {
                 {activeScreen === 'MENU' && <MenuScreen />}
                 {activeScreen === 'ORDERS' && <OrdersScreen />}
                 {activeScreen === 'PROFILE' && <ProfileScreen />}
-                {activeScreen === 'ADMIN_PANEL' && <AdminScreen
-                    orders={orders}
-                    menuItems={menuItems}
-                    adminTab={adminTab}
-                    setAdminTab={setAdminTab}
-                    adminRechargeCode={adminRechargeCode}
-                    setAdminRechargeCode={setAdminRechargeCode}
-                    adminFeedback={adminFeedback}
-                    isAdminProcessing={isAdminProcessing}
-                    isEditingItem={isEditingItem}
-                    setIsEditingItem={setIsEditingItem}
-                    editingItem={editingItem}
-                    setEditingItem={setEditingItem}
-                    setActiveScreen={setActiveScreen}
-                    handleAdminRecharge={handleAdminRecharge}
-                    handleCompleteRecharge={handleCompleteRecharge}
-                    pendingRecharges={pendingRecharges}
-                    handleUpdateOrderStatus={handleUpdateOrderStatus}
-                    openEditItemModal={openEditItemModal}
-                    handleSaveItem={handleSaveItem}
-                    handleDeleteItem={handleDeleteItem}
-                    handleLogout={handleLogout}
-                />}
+                {activeScreen === 'ADMIN_PANEL' && (
+                    !adminSelectedSchool ? (
+                        <div className="bg-[#0f1218] min-h-screen text-white p-6 -mx-4 md:-mx-8 md:-mt-8 -mt-4 flex flex-col items-center">
+                            <h2 className="text-3xl font-bold mb-8 mt-12 text-center">Selecciona el plantel a administrar</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
+                                {Object.entries(BACHILLERATOS).map(([campus, schools]) => (
+                                    <div key={campus} className="bg-[#1e2330] p-6 rounded-3xl border border-gray-800 flex flex-col hover:border-gray-700 transition-colors">
+                                        <h3 className="text-xl font-bold text-green-500 mb-4">{campus}</h3>
+                                        <div className="space-y-2 flex-1">
+                                            {schools.map(school => (
+                                                <button 
+                                                    key={school} 
+                                                    onClick={() => setAdminSelectedSchool(school)}
+                                                    className="w-full text-left bg-[#13161f] hover:bg-[#2f364a] border border-gray-800 p-3 rounded-xl transition-colors font-medium text-sm text-gray-300 hover:text-white"
+                                                >
+                                                    {school}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button onClick={handleLogout} className="mt-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors bg-[#1e2330] px-6 py-3 rounded-full border border-gray-800">
+                                <LogOut size={20} /> Cerrar Sesión
+                            </button>
+                        </div>
+                    ) : (
+                        <AdminScreen
+                            orders={orders.filter(o => o.school === adminSelectedSchool)}
+                            menuItems={menuItems}
+                            adminTab={adminTab}
+                            setAdminTab={setAdminTab}
+                            adminRechargeCode={adminRechargeCode}
+                            setAdminRechargeCode={setAdminRechargeCode}
+                            adminFeedback={adminFeedback}
+                            isAdminProcessing={isAdminProcessing}
+                            isEditingItem={isEditingItem}
+                            setIsEditingItem={setIsEditingItem}
+                            editingItem={editingItem}
+                            setEditingItem={setEditingItem}
+                            setActiveScreen={setActiveScreen}
+                            handleAdminRecharge={handleAdminRecharge}
+                            handleCompleteRecharge={handleCompleteRecharge}
+                            pendingRecharges={pendingRecharges.filter(r => r.school === adminSelectedSchool)}
+                            handleUpdateOrderStatus={handleUpdateOrderStatus}
+                            openEditItemModal={openEditItemModal}
+                            handleSaveItem={handleSaveItem}
+                            handleDeleteItem={handleDeleteItem}
+                            handleLogout={handleLogout}
+                            adminSelectedSchool={adminSelectedSchool}
+                            onBackToSchoolSelect={() => setAdminSelectedSchool('')}
+                        />
+                    )
+                )}
             </main>
 
             {user && (

@@ -70,3 +70,56 @@ export const MENU_ITEMS: MenuItem[] = [
 ];
 
 export const CATEGORIES = Object.values(Category);
+
+export const BACHILLERATOS = {
+  'Campus Colima': [
+    'Bachillerato 1',
+    'Bachillerato 2',
+    'Bachillerato 3',
+    'Bachillerato 3 (Semiescolarizado)',
+    'Bachillerato 15',
+    'Bachillerato 30',
+    'Instituto Universitario Bellas Artes'
+  ],
+  'Campus Villa de Álvarez': [
+    'Bachillerato 4',
+    'Bachillerato 11',
+    'Bachillerato 12',
+    'Bachillerato 13',
+    'Bachillerato 16',
+    'Bachillerato 17',
+    'Bachillerato 22',
+    'Bachillerato 25',
+    'Bachillerato 29',
+    'Bachillerato 32',
+    'Bachillerato 33',
+    'Bachillerato 34'
+  ],
+  'Campus Manzanillo': [
+    'Bachillerato 8',
+    'Bachillerato 9',
+    'Bachillerato 10',
+    'Bachillerato 10 (Semiescolarizado)',
+    'Bachillerato 14',
+    'Bachillerato 23',
+    'Bachillerato 27',
+    'Bachillerato 28',
+    'Escuela Técnica de Enfermería'
+  ],
+  'Campus Tecomán': [
+    'Bachillerato 5',
+    'Bachillerato 6',
+    'Bachillerato 6 (Semiescolarizado)',
+    'Bachillerato 7',
+    'Bachillerato 19',
+    'Bachillerato 20',
+    'Bachillerato 21',
+    'Bachillerato 24',
+    'Bachillerato 26',
+    'Bachillerato 31',
+    'Bachillerato 35'
+  ],
+  'Campus Coquimatlán': [
+    'Bachillerato 18'
+  ]
+};
