@@ -7,7 +7,7 @@ interface CartProps {
     onClose: () => void;
     items: CartItem[];
     loyaltyPoints: number;
-    onUpdateQuantity: (id: string, delta: number) => void;
+    onUpdateQuantity: (id: string, variety: string | undefined, delta: number) => void;
     onCheckout: (pickupTime: string, pointsRedeemed: number, discount: number, paymentMethod: 'CASH' | 'COINS') => void;
 }
 
@@ -115,7 +115,10 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, items, loyaltyPoints, onUp
                             <div key={item.id} className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex gap-3 transition-colors">
                                 <img src={item.image} alt={item.name} className="w-16 h-16 rounded-lg object-cover bg-gray-100 dark:bg-gray-700" />
                                 <div className="flex-1">
-                                    <h4 className="font-medium text-gray-800 dark:text-white text-sm">{item.name}</h4>
+                                    <h4 className="font-medium text-gray-800 dark:text-white text-sm">
+                                        {item.name}
+                                        {item.selectedVariety && <span className="text-[11px] text-gray-500 block italic leading-none mt-1">{item.selectedVariety}</span>}
+                                    </h4>
                                     <p className="text-green-700 dark:text-green-400 font-bold text-sm flex items-center gap-1">
                                         <Coins className="w-3 h-3" />
                                         {item.price * item.quantity} UC
@@ -124,14 +127,14 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose, items, loyaltyPoints, onUp
                                 <div className="flex flex-col items-end justify-between">
                                     <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded-lg px-2 py-1 border border-gray-200 dark:border-gray-700">
                                         <button 
-                                            onClick={() => onUpdateQuantity(item.id, -1)}
+                                            onClick={() => onUpdateQuantity(item.id, item.selectedVariety, -1)}
                                             className="text-gray-500 dark:text-gray-400 hover:text-red-500 disabled:opacity-50"
                                         >
                                             -
                                         </button>
                                         <span className="text-sm font-medium w-4 text-center text-gray-800 dark:text-white">{item.quantity}</span>
                                         <button 
-                                            onClick={() => onUpdateQuantity(item.id, 1)}
+                                            onClick={() => onUpdateQuantity(item.id, item.selectedVariety, 1)}
                                             className="text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400"
                                         >
                                             +

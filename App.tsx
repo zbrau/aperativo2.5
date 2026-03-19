@@ -464,20 +464,20 @@ const App: React.FC = () => {
         });
     }, [selectedCategory, searchQuery, menuItems, user]);
 
-    const addToCart = (item: MenuItem) => {
+    const addToCart = (item: MenuItem, selectedVariety?: string) => {
         setCartItems(prev => {
-            const existing = prev.find(i => i.id === item.id);
+            const existing = prev.find(i => i.id === item.id && i.selectedVariety === selectedVariety);
             if (existing) {
-                return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+                return prev.map(i => (i.id === item.id && i.selectedVariety === selectedVariety) ? { ...i, quantity: i.quantity + 1 } : i);
             }
-            return [...prev, { ...item, quantity: 1 }];
+            return [...prev, { ...item, quantity: 1, selectedVariety }];
         });
         setTimeout(() => setIsCartOpen(true), 10);
     };
 
-    const updateQuantity = (id: string, delta: number) => {
+    const updateQuantity = (id: string, variety: string | undefined, delta: number) => {
         setCartItems(prev => prev.map(item => {
-            if (item.id === id) {
+            if (item.id === id && item.selectedVariety === variety) {
                 return { ...item, quantity: Math.max(0, item.quantity + delta) };
             }
             return item;

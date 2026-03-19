@@ -4,13 +4,14 @@ import { MenuItem } from '../types';
 
 interface FoodItemProps {
     item: MenuItem;
-    onAdd: (item: MenuItem) => void;
+    onAdd: (item: MenuItem, variety?: string) => void;
     isFavorite?: boolean;
     onToggleFavorite?: (itemId: string) => void;
 }
 
 const FoodItem: React.FC<FoodItemProps> = ({ item, onAdd, isFavorite = false, onToggleFavorite }) => {
     const [heartPulse, setHeartPulse] = useState(false);
+    const [showVarieties, setShowVarieties] = useState(false);
 
     // Simulación: El precio en la cafetería física es 5 UC más caro
     const storePrice = item.price + 5;
@@ -18,7 +19,11 @@ const FoodItem: React.FC<FoodItemProps> = ({ item, onAdd, isFavorite = false, on
     const handleAddItem = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
-        onAdd(item);
+        if (item.varieties && item.varieties.length > 0) {
+            setShowVarieties(true);
+        } else {
+            onAdd(item);
+        }
     };
 
     const handleToggleFav = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -100,13 +105,29 @@ const FoodItem: React.FC<FoodItemProps> = ({ item, onAdd, isFavorite = false, on
                     </p>
                 </div>
                 
-                <button 
-                    onClick={handleAddItem}
-                    className="w-full bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400 active:bg-green-200 border border-green-200 dark:border-green-800 font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-95 transform"
-                >
-                    <Plus size={14} strokeWidth={3} />
-                    AGREGAR
-                </button>
+                {showVarieties ? (
+                    <div className="flex flex-col gap-2 animate-fade-in mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
+                        <div className="text-[10px] font-bold text-gray-500 uppercase">Selecciona de qué lo quieres:</div>
+                        <div className="flex flex-wrap gap-1.5">
+                            {item.varieties?.map(v => (
+                                <button key={v} onClick={(e) => { e.stopPropagation(); onAdd(item, v); setShowVarieties(false); }} className="px-2 py-1.5 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 rounded-lg text-xs font-bold hover:bg-green-200 dark:hover:bg-green-800 transition-colors">
+                                    {v}
+                                </button>
+                            ))}
+                            <button onClick={(e) => { e.stopPropagation(); setShowVarieties(false); }} className="px-2 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <button 
+                        onClick={handleAddItem}
+                        className="w-full bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400 active:bg-green-200 border border-green-200 dark:border-green-800 font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-95 transform mt-2"
+                    >
+                        <Plus size={14} strokeWidth={3} />
+                        AGREGAR
+                    </button>
+                )}
             </div>
         </div>
     );

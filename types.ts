@@ -19,11 +19,13 @@ export interface MenuItem {
     prepTime: number; // in minutes
     isPopular?: boolean;
     school?: string;
+    varieties?: string[];
 }
 
 export interface CartItem extends MenuItem {
     quantity: number;
     note?: string;
+    selectedVariety?: string;
 }
 
 export enum OrderStatus {

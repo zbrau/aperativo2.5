@@ -387,7 +387,22 @@ const AdminScreen: React.FC<AdminScreenProps> = ({
                                         />
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Variedades u Opciones (separadas por comas)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej. Lomo, Adobada, Pollo"
+                                        value={editingItem.varieties?.join(', ') || ''}
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            const vList = val.split(',').map(s => s.trim()).filter(Boolean);
+                                            setEditingItem({ ...editingItem, varieties: vList.length > 0 ? vList : [] });
+                                        }}
+                                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-sm dark:text-white"
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-1">Si dejas este campo vacío, el platillo no tendrá opciones.</p>
+                                </div>
+                                <div className="flex items-center gap-2 mt-4">
                                     <input
                                         type="checkbox"
                                         checked={editingItem.isPopular || false}
