@@ -8,7 +8,6 @@ Aplicación web para la gestión de pedidos y menú de cafetería escolar.
 - TailwindCSS
 - Firebase
 - Lucide Icons
-- Integración con IA de Google Gemini
 
 ## Instrucciones de Instalación
 
