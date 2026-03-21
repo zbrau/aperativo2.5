@@ -1,10 +1,10 @@
-# 🍽️ Snack UDC
+# - Snack UDC
 
 Aplicación web de pedidos para la cafetería de la Universidad de Colima (UDC). Permite a los alumnos pedir comida desde su dispositivo, pagar con saldo virtual y recibir su pedido sin hacer fila.
 
 ---
 
-## 🚀 Stack Tecnológico
+## - Stack Tecnológico
 
 | Tecnología | Uso |
 |---|---|
@@ -17,9 +17,9 @@ Aplicación web de pedidos para la cafetería de la Universidad de Colima (UDC).
 
 ---
 
-## ✨ Funcionalidades
+## -- Funcionalidades
 
-### 👤 Para el usuario
+### - Para el usuario
 - **Autenticación** — Registro e inicio de sesión con selección de bachillerato
 - **Menú** — Explorar platillos por categoría (Desayuno, Comida, Snacks, Bebidas, Saludable) con buscador en tiempo real
 - **Variantes** — Elegir la variante de un platillo antes de agregar al carrito
@@ -36,7 +36,7 @@ Aplicación web de pedidos para la cafetería de la Universidad de Colima (UDC).
 - **Modo oscuro/claro** — Toggle de tema persistente
 - **PWA** — Instalable en móvil como app nativa
 
-### 🛡️ Para el administrador
+### -- Para el administrador
 - **Selección de plantel** — El admin elige qué bachillerato gestionar
 - **Pedidos activos** — Vista tipo cocina con tarjetas en tiempo real; marcar como Listo o Entregado
 - **Nombre del cliente** — Cada pedido muestra el nombre de quien pidió y su plantel de origen
@@ -52,7 +52,7 @@ Aplicación web de pedidos para la cafetería de la Universidad de Colima (UDC).
 
 ---
 
-## 📁 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 apera2.0/
@@ -75,7 +75,7 @@ apera2.0/
 
 ---
 
-## 🗄️ Modelo de Datos (Firestore)
+##  Modelo de Datos (Firestore)
 
 ### `users/{email}`
 ```ts
@@ -100,7 +100,7 @@ apera2.0/
 
 ---
 
-## 🏗️ Instalación y Desarrollo
+##  Instalación y Desarrollo
 
 ```bash
 # Instalar dependencias
@@ -116,7 +116,7 @@ npm run build
 
 ---
 
-## 🌐 Despliegue
+##  Despliegue
 
 El proyecto está configurado para **Vercel**.
 
@@ -128,7 +128,7 @@ El proyecto está configurado para **Vercel**.
 
 ---
 
-## 🔑 Variables de Entorno
+##  Variables de Entorno
 
 
 
