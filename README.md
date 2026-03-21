@@ -13,7 +13,7 @@ Aplicación web de pedidos para la cafetería de la Universidad de Colima (UDC).
 | **Firebase / Firestore** | Base de datos en tiempo real y autenticación |
 | **Tailwind CSS** | Estilos (via CDN en dev, Vite build en prod) |
 | **Lucide React** | Iconografía |
-| **Google GenAI** | Asistente de IA integrado |
+
 
 ---
 
