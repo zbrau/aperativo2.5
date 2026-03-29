@@ -1049,17 +1049,11 @@ const App: React.FC = () => {
                     </div>
 
                     {/* Developer Credits */}
-                    <button onClick={() => setShowCreditsModal(true)} className="w-full bg-[#18181b] hover:bg-[#27272a] p-4 rounded-xl border border-gray-800 flex items-center justify-between group transition-all shadow-sm">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-[#27272a] group-hover:bg-[#3f3f46] p-2.5 rounded-lg text-white transition-colors">
-                                <Github size={20} />
-                            </div>
-                            <div className="text-left">
-                                <h4 className="font-bold text-white text-sm">Programador: Braulio</h4>
-                                <p className="text-gray-400 text-xs mt-0.5">Ver mis proyectos</p>
-                            </div>
+                    <button onClick={() => setShowCreditsModal(true)} className="w-full bg-white dark:bg-[#1e2330] hover:bg-gray-50 dark:hover:bg-[#252b3b] p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between group transition-all shadow-sm">
+                        <div>
+                            <h4 className="font-bold text-gray-800 dark:text-white text-sm">Créditos</h4>
                         </div>
-                        <ChevronRight className="text-gray-500 group-hover:text-white transition-colors" size={16} />
+                        <ChevronRight className="text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-white transition-colors" size={16} />
                     </button>
 
                     {/* Logout */}
